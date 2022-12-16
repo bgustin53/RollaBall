@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 {
     // PlayerController properties
     private Rigidbody rb;               // Allows for use of physics
+    private int count;                  // Holds the number of collectibles that have been picked up
     private float movementX;            // Holds forwars/backward component of movement vector
     private float movementY;            // Holds left/right component of movement vector
 
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        count = 0;
     }
 
     // Gets keypresses from Input Actions and applies it to the Player Movement
@@ -45,6 +47,15 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
         rb.AddForce(movement * speed);
         
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            other.gameObject.SetActive(false);
+            count++;
+        }
     }
 
     // Detects collisions with pickups and counts them
