@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 /*****************************************
  * This script will control both the
@@ -19,13 +20,17 @@ public class PlayerController : MonoBehaviour
     private float movementX;            // Holds forwars/backward component of movement vector
     private float movementY;            // Holds left/right component of movement vector
 
-    private float speed = 10;
+    private float speed = 10;           // Holds the speed ot the player at 10 m/s
+    public TextMeshProUGUI countText;   // Hold the value of the count as text.
+    public GameObject winTextObject;    // This field only is enabled or disabled
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         count = 0;
+        SetCountText();
+        winTextObject.SetActive(false);
     }
 
     // Gets keypresses from Input Actions and applies it to the Player Movement
@@ -37,6 +42,14 @@ public class PlayerController : MonoBehaviour
         movementY = movementVector.y;
     }
 
+    void SetCountText()
+    {
+        countText.text = "Count: " + count.ToString();
+        if (count >= 12)
+        {
+            winTextObject.SetActive(true);
+        }
+    }
 
     // Displays pickup count and end game message to the screen
 
@@ -55,6 +68,7 @@ public class PlayerController : MonoBehaviour
         {
             other.gameObject.SetActive(false);
             count++;
+            SetCountText();
         }
     }
 
