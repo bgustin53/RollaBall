@@ -1,76 +1,64 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TMPro;
-
-/*****************************************
- * This script will control both the
- * player actions and the UI
- * 
- * Author: Bruce Gustin
- * December 11, 2022
- ****************************************/
 
 public class PlayerController : MonoBehaviour
 {
-    // PlayerController properties
-    private Rigidbody rb;               // Allows for use of physics
-    private int count;                  // Holds the number of collectibles that have been picked up
-    private float movementX;            // Holds forwars/backward component of movement vector
-    private float movementY;            // Holds left/right component of movement vector
+    public TextMeshProUGUI countText;
+    public GameObject winTextObject;
 
-    private float speed = 10;           // Holds the speed ot the player at 10 m/s
-    public TextMeshProUGUI countText;   // Hold the value of the count as text.
-    public GameObject winTextObject;    // This field only is enabled or disabled
+    private float speed;            // How hard the ball is pushed
+    private float xDirection;       // Move the ball left and right
+    private float zDirection;       // Move the ball forward and backwards;
+    private int count;              // Counts the pickups
 
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        speed = 60;
         count = 0;
         SetCountText();
         winTextObject.SetActive(false);
     }
 
-    // Gets keypresses from Input Actions and applies it to the Player Movement
-    private void OnMove(InputValue movementValue)
+    // Update is called once per frame
+    void Update()
     {
-        Vector2 movementVector = movementValue.Get<Vector2>();
-
-        movementX = movementVector.x;
-        movementY = movementVector.y;
+        GetPlayerInput();
+        MoveBall();
     }
 
-    void SetCountText()
+    // Uses player input to move the ball
+    private void MoveBall()
     {
-        countText.text = "Count: " + count.ToString();
-        if (count >= 12)
+        Vector3 direction = new Vector3(xDirection, 0, zDirection);
+        GetComponent<Rigidbody>().AddForce(direction * Time.deltaTime * speed);
+    }
+
+    // Listen for player clicking arrow or WASD keys
+    private void GetPlayerInput()
+    {
+        xDirection = Input.GetAxis("Horizontal");
+        zDirection = Input.GetAxis("Vertical");
+    }
+
+    private void SetCountText()
+    {
+        countText.text = "Count " + count.ToString();
+        if(count >= 12)
         {
             winTextObject.SetActive(true);
         }
     }
 
-    // Displays pickup count and end game message to the screen
-
-
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        Vector3 movement = new Vector3(movementX, 0.0f, movementY);
-        rb.AddForce(movement * speed);
-        
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("PickUp"))
+        if(other.gameObject.CompareTag("PickUp"))
         {
             other.gameObject.SetActive(false);
-            count++;
+            count = count + 1;
             SetCountText();
         }
     }
-
-    // Detects collisions with pickups and counts them
 }
